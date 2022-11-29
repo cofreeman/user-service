@@ -1,5 +1,6 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.vo.Greeting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -14,6 +15,9 @@ public class UserController {
     Environment environment;
 
     @Autowired
+    Greeting greeting;
+
+    @Autowired
     public UserController(Environment environment) {
         this.environment = environment;
     }
@@ -25,6 +29,7 @@ public class UserController {
 
     @GetMapping("/welcome")
     public String welcome(){
-        return environment.getProperty("greeting.message");
+//        return environment.getProperty("greeting.message");
+        return greeting.getMessage();
     }
 }
