@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user-service")
 @Slf4j
 public class UserController {
     Environment environment;
@@ -32,7 +32,7 @@ public class UserController {
 
     @GetMapping("/health_check")
     public String status(){
-        return "It's ok";
+        return String.format("It's ok Port %s", environment.getProperty("local.server.port"));
     }
 
     @GetMapping("/welcome")
