@@ -1,7 +1,6 @@
 package com.example.userservice.service;
 
 import com.example.userservice.dto.UserDto;
-import com.example.userservice.exception.NotFoundUserException;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
@@ -31,7 +30,7 @@ public class UserServiceImpl implements UserService {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
-        userEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
+        userEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
 
         userRepository.save(userEntity);
 
@@ -65,14 +64,20 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByEmail(username).orElseThrow(()->{
             throw new UsernameNotFoundException("not found username");
         });
-        return new User(userEntity.getEmail(),userEntity.getEncryptedPwd(),true,true,true,true,
+        return new User(userEntity.getEmail(),userEntity.getEncryptedPassword(),true,true,true,true,
                 new ArrayList<>());
     }
 
     @Override
     public UserDto getUserByEmail(String email) {
-        return new ModelMapper().map(userRepository.findByEmail(email).orElseThrow(()-> {
+        ModelMapper mapper = new ModelMapper();
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> {
             throw new UsernameNotFoundException("not found username");
-        }),UserDto.class);
+        });
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+
+        UserDto userDto = mapper.map(userEntity, UserDto.class);
+        return userDto;
+
     }
 }
