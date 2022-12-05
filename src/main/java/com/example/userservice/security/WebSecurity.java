@@ -23,14 +23,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 //        http.authorizeRequests().antMatchers("/users/**").permitAll();
         http.authorizeRequests().antMatchers("/**")//모든 요청에
-                .hasIpAddress("192.168.0.8")// 이 아이피만
+                .hasIpAddress("192.168.219.133")// 이 아이피만
                 .and()//그리고
                 .addFilter(getAuthenticationFilter());//todo 1: 필터를 거친 요청만 처리한다. 여기서 필터는 인증처리 필터
         http.headers().frameOptions().disable();
     }
 
     private AuthenticationFilter getAuthenticationFilter() throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter();//todo 2 인증처리하기 위한 UsernamePasswordFilter 를 상속받은 필터 정의
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager(),userService,env);//todo 2 인증처리하기 위한 UsernamePasswordFilter 를 상속받은 필터 정의
         authenticationFilter.setAuthenticationManager(authenticationManager());//todo 3 인증처리하기 위해, Spring security 에서 Manager 가져옴
 
         return authenticationFilter;

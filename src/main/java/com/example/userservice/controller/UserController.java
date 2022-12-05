@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user-service/users")
 @Slf4j
 public class UserController {
     Environment environment;
@@ -45,8 +44,8 @@ public class UserController {
         return greeting.getMessage();
     }
 
-    @PostMapping
-    public ResponseEntity createUser(@RequestBody RequestUser user){
+    @PostMapping("/users")
+    public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser user){
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
@@ -58,7 +57,7 @@ public class UserController {
                 .body(responseUser);
     }
 
-    @GetMapping
+    @GetMapping("/users")
     public ResponseEntity<List<ResponseUser>> getUsers(){
         Iterable<UserEntity> userList = userService.getUserByAll();
 
@@ -70,7 +69,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<ResponseUser> getUser(@PathVariable("userId") String userId){
         UserDto userDto = userService.getUserByUserId(userId);
         ResponseUser returnValue = new ModelMapper().map(userDto, ResponseUser.class);
