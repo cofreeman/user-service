@@ -26,6 +26,12 @@ eureka:
 greeting:
   message: Welcome to the Simple E-commerce
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans
+        # refresh = microservice 의 configServer 에서 가져와야할 정보를 갱신하겠다.
 #token:
 #  expiration_time: 8640000
 #  secret: user_token
