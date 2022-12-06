@@ -28,24 +28,30 @@ public class UserController {
     Greeting greeting;
 
     @Autowired
-    public UserController(Environment environment,UserService userService) {
+    public UserController(Environment environment, UserService userService) {
         this.environment = environment;
         this.userService = userService;
     }
 
     @GetMapping("/health_check")
-    public String status(){
-        return String.format("It's ok Port %s", environment.getProperty("local.server.port"));
+    public String status() {
+        return String.format("It's Working in User Service"
+                + ", port(local.server.port)=" + environment.getProperty("local.server.port")
+                + ", port(server.port)=" + environment.getProperty("server.port")
+//                + ", gateway ip=" + environment.getProperty("gateway.ip")
+//                + ", message=" + environment.getProperty("greeting.message"));
+                + ", token secret=" + environment.getProperty("token.secret")
+                + ", token expiration time=" + environment.getProperty("token.expiration_time"));
     }
 
     @GetMapping("/welcome")
-    public String welcome(){
+    public String welcome() {
 //        return environment.getProperty("greeting.message");
         return greeting.getMessage();
     }
 
     @PostMapping("/users")
-    public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser user){
+    public ResponseEntity<ResponseUser> createUser(@RequestBody RequestUser user) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
@@ -58,19 +64,19 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<ResponseUser>> getUsers(){
+    public ResponseEntity<List<ResponseUser>> getUsers() {
         Iterable<UserEntity> userList = userService.getUserByAll();
 
         List<ResponseUser> result = new ArrayList<>();
         userList.forEach(v -> {
-            result.add(new ModelMapper().map(v,ResponseUser.class));
+            result.add(new ModelMapper().map(v, ResponseUser.class));
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<ResponseUser> getUser(@PathVariable("userId") String userId){
+    public ResponseEntity<ResponseUser> getUser(@PathVariable("userId") String userId) {
         UserDto userDto = userService.getUserByUserId(userId);
         ResponseUser returnValue = new ModelMapper().map(userDto, ResponseUser.class);
 
