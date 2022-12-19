@@ -1,12 +1,16 @@
 package com.example.userservice.service;
 
+import com.example.userservice.client.OrderServiceClient;
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,9 +23,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+//    private final RestTemplate restTemplate;
+    private final Environment env;
+    private final OrderServiceClient orderServiceClient;
+
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -42,13 +51,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserByUserId(String userId) {
         UserEntity userEntity = userRepository.findByUserId(userId)
-                .orElseThrow(()-> {
+                .orElseThrow(() -> {
                     throw new UsernameNotFoundException("User Not Found");
                 });
 
         UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
 
-        List<ResponseOrder> orderList = new ArrayList<>();
+        /* UsingRestTemplate **/
+//        String orderUrl = String.format(env.getProperty("order_service.url"),userId);
+//
+//        ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+//                new ParameterizedTypeReference<List<ResponseOrder>>() {
+//                });
+//
+//        List<ResponseOrder> orderList = orderListResponse.getBody();
+
+        /* Using feign client */
+//        List<ResponseOrder> orderList = null;
+//        try {
+//            orderList = orderServiceClient.getOrders(userId);
+//        } catch (FeignException ex){
+//            log.error(ex.getMessage());
+//        }
+        List<ResponseOrder> orderList = orderServiceClient.getOrders(userId);
         userDto.setOrders(orderList);
         return userDto;
 
@@ -61,10 +86,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByEmail(username).orElseThrow(()->{
+        UserEntity userEntity = userRepository.findByEmail(username).orElseThrow(() -> {
             throw new UsernameNotFoundException("not found username");
         });
-        return new User(userEntity.getEmail(),userEntity.getEncryptedPassword(),true,true,true,true,
+        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true, true, true, true,
                 new ArrayList<>());
     }
 

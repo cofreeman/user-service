@@ -24,7 +24,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 //        http.authorizeRequests().antMatchers("/users/**").permitAll();
         http.authorizeRequests().antMatchers("/actuator/**").permitAll();
         http.authorizeRequests().antMatchers("/**")//모든 요청에
-                .hasIpAddress("192.168.219.142")// 이 아이피만
+                .hasIpAddress("192.168.219.108")// 이 아이피만
                 .and()//그리고
                 .addFilter(getAuthenticationFilter());//todo 1: 필터를 거친 요청만 처리한다. 여기서 필터는 인증처리 필터
         http.headers().frameOptions().disable();
