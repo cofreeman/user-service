@@ -41,7 +41,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh, health, beans,busrefresh
+        include: refresh, health, beans,busrefresh, info, metrics, prometheus
         # refresh = microservice 의 configServer 에서 가져와야할 정보를 갱신하겠다.
 #token:
 #  expiration_time: 8640000
